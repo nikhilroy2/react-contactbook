@@ -2,16 +2,25 @@ import { useState, useEffect } from "react";
 import "./App.css";
 import Lottie from "lottie-react";
 import NotFoundIcon from "./assets/lottiefiles/not_found.json";
-import ContactBookCreateModal from './components/ContactBookCreateModal'
+import ContactBookCreateModal from "./components/ContactBookCreateModal";
+import { useSelector, useDispatch } from "react-redux";
+import { isContactBookModal } from "./redux/slice/contactBookSlice";
+import { contactBookList } from "./redux/slice/contactBookListSlice";
+import ContactBookEditModal from "./components/ContactBookEditModal";
 function App() {
-  const [contactBookList, setContactBookList] = useState([]);
+  const dispatch = useDispatch();
+  // const [contactBookList, setContactBookList] = useState([]);
+  const [contactBookPut, setContactBookPut] = useState([]);
+  const contact_book_list = useSelector(
+    (state) => state.contact_book_list.value
+  );
   const handleContactBook = async () => {
     try {
       const response = await fetch(
         "https://django-nikhil-api.vercel.app/api/contact_book"
       );
       const data = await response.json();
-      setContactBookList(data);
+      dispatch(contactBookList(data));
     } catch (error) {
       console.error("Error fetching contact book data", error);
     }
@@ -20,6 +29,40 @@ function App() {
   useEffect(() => {
     handleContactBook();
   }, []);
+
+  const handleModalOpen = () => {
+    dispatch(isContactBookModal(true));
+    new mdb.Modal(document.querySelector("#contactBookCreateModal")).show();
+  };
+
+  const handleDelete = async (contact_book_id) => {
+    try {
+      const response = await fetch(
+        `https://django-nikhil-api.vercel.app/api/contact_book/${contact_book_id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+      } else {
+        // Handle error response
+        console.error("Error:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching contact book data", error);
+    }
+  };
+
+  const handleEdit = (contact_book_id)=> {
+    setContactBookPut(contact_book_list.filter(value=> value.contact_book_id === contact_book_id)[0]);
+    new mdb.Modal(document.querySelector("#contactBookEditModal")).show();
+  }
 
   return (
     <>
@@ -32,7 +75,10 @@ function App() {
                   <h2 className="text-center mb-0">Contact Book</h2>
                 </div>
                 <div className="col-auto">
-                  <button className="btn btn-primary btn-floating" onClick={()=> new mdb.Modal(document.querySelector('#contactBookCreateModal')).show()}>
+                  <button
+                    className="btn btn-primary btn-floating"
+                    onClick={() => handleModalOpen()}
+                  >
                     <i className="fa fa-plus fs-6" aria-hidden="true"></i>
                   </button>
                 </div>
@@ -51,8 +97,8 @@ function App() {
                     </tr>
                   </thead>
                   <tbody>
-                    {contactBookList.length ? (
-                      contactBookList.map((value, index) => {
+                    {contact_book_list.length ? (
+                      contact_book_list.map((value, index) => {
                         return (
                           <tr key={index}>
                             <td>{value.name}</td>
@@ -64,8 +110,21 @@ function App() {
                                 <button className="btn btn-primary btn-sm">
                                   Show
                                 </button>
-                                <button className="btn btn-danger btn-sm">
+                                <button
+                                  onClick={() =>
+                                    handleDelete(value.contact_book_id)
+                                  }
+                                  className="btn btn-danger btn-sm"
+                                >
                                   Delete
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleEdit(value.contact_book_id)
+                                  }
+                                  className="btn btn-info btn sm"
+                                >
+                                  Edit
                                 </button>
                               </div>
                             </td>
@@ -93,6 +152,7 @@ function App() {
 
       {/* ===========Modal Import========= */}
       <ContactBookCreateModal></ContactBookCreateModal>
+      <ContactBookEditModal contactBookPut={contactBookPut}></ContactBookEditModal>
     </>
   );
 }

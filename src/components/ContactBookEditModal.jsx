@@ -2,13 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { isContactBookModal } from "../redux/slice/contactBookSlice";
 import { appendContactBook } from "../redux/slice/contactBookListSlice";
-function ContactBookCreateModal(props) {
+import { editContactBook } from "../redux/slice/contactBookListSlice";
+function ContactBookEditModal({contactBookPut}) {
   const dispatch = useDispatch();
   const inputName = useRef();
   const inputPhone = useRef();
   const inputEmail = useRef();
   const inputAddress = useRef();
-  const handleContactBookSubmit = async (event) => {
+  const handleContactBookEdit = async (event) => {
     event.preventDefault();
     // Gather the form data
     const name = inputName.current.value;
@@ -25,11 +26,11 @@ function ContactBookCreateModal(props) {
     };
 
     try {
-      // Make the POST request
+      // Make the PUT request
       const response = await fetch(
-        "https://django-nikhil-api.vercel.app/api/contact_book",
+        `https://django-nikhil-api.vercel.app/api/contact_book/${contactBookPut.contact_book_id}`,
         {
-          method: "POST",
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
@@ -42,9 +43,9 @@ function ContactBookCreateModal(props) {
         // Handle successful response
         const data = await response.json();
         // console.log("Success:", data);
-        dispatch(appendContactBook(data))
+        dispatch(editContactBook(data))
         dispatch(isContactBookModal(false));
-        document.querySelector('#contactBookCreateModal .btn-close').click() // close modal
+        document.querySelector('#contactBookEditModal .btn-close').click() // close modal
       } else {
         // Handle error response
         console.error("Error:", response.statusText);
@@ -53,13 +54,14 @@ function ContactBookCreateModal(props) {
       console.error("Request failed", error);
     }
   };
+  // console.log(contactBookPut)
   return (
-    <div className="modal fade" id="contactBookCreateModal">
+    <div className="modal fade" id="contactBookEditModal">
       <div className="modal-dialog">
-        <form className="modal-content" onSubmit={handleContactBookSubmit}>
+        <form className="modal-content" onSubmit={handleContactBookEdit}>
           <div className="modal-header">
             <h5 className="modal-title" id="exampleModalLabel">
-              Create Contact Book
+              Edit Contact Book
             </h5>
             <button
               type="button"
@@ -78,6 +80,8 @@ function ContactBookCreateModal(props) {
                 ref={inputName}
                 type="text"
                 required
+                data-value={contactBookPut.name}
+                defaultValue={contactBookPut.name}
                 name="name"
                 className="form-control border"
               />
@@ -89,6 +93,7 @@ function ContactBookCreateModal(props) {
               <input
                 ref={inputPhone}
                 type="number"
+                defaultValue={contactBookPut.phone}
                 required
                 name="phone"
                 className="form-control border"
@@ -101,6 +106,7 @@ function ContactBookCreateModal(props) {
               <input
                 ref={inputEmail}
                 type="email"
+                defaultValue={contactBookPut.email}
                 name="email"
                 className="form-control border"
               />
@@ -111,6 +117,7 @@ function ContactBookCreateModal(props) {
               </label>
               <textarea
                 ref={inputAddress}
+                defaultValue={contactBookPut.location}
                 name="address"
                 className="form-control border"
               ></textarea>
@@ -121,7 +128,7 @@ function ContactBookCreateModal(props) {
               Reset
             </button>
             <button type="submit" className="btn btn-primary">
-              Save changes
+              Update changes
             </button>
           </div>
         </form>
@@ -130,4 +137,4 @@ function ContactBookCreateModal(props) {
   );
 }
 
-export default ContactBookCreateModal;
+export default ContactBookEditModal;
