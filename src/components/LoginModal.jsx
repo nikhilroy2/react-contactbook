@@ -30,6 +30,8 @@ function LoginModal(props) {
         const data = await response.json(); // Parse JSON response
         localStorage.setItem("token", data.access); // Store the token in localStorage
 
+        // ui update
+        document.querySelector('#loginModal .btn-close').click() // close modal
         // Success alert
         alert("Login successful!");
         dispatch(isLoginNow(true)); // login success in redux store
@@ -48,6 +50,7 @@ function LoginModal(props) {
       console.error("Login error: ", error);
     }
   };
+
 
   function refreshTokenFunc() {
     const refreshToken = localStorage.getItem("refresh_token");

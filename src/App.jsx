@@ -8,8 +8,10 @@ import { isContactBookModal } from "./redux/slice/contactBookSlice";
 import { contactBookList } from "./redux/slice/contactBookListSlice";
 import ContactBookEditModal from "./components/ContactBookEditModal";
 import LoginModal from "./components/LoginModal";
+import { isLoginNow } from "./redux/slice/loginSlice";
 function App() {
   const dispatch = useDispatch();
+  const loggedUser = useSelector(state=> state.auth_login.value)
   // const [contactBookList, setContactBookList] = useState([]);
   const [contactBookPut, setContactBookPut] = useState([]);
   const contact_book_list = useSelector(
@@ -159,7 +161,8 @@ function App() {
       {/* ===========Modal Import========= */}
       <ContactBookCreateModal></ContactBookCreateModal>
       <ContactBookEditModal contactBookPut={contactBookPut}></ContactBookEditModal>
-      <LoginModal></LoginModal>
+      {loggedUser ? "" : <LoginModal></LoginModal>}
+      
     </>
   );
 }
