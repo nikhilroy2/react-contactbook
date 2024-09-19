@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { isContactBookModal } from "./redux/slice/contactBookSlice";
 import { contactBookList } from "./redux/slice/contactBookListSlice";
 import ContactBookEditModal from "./components/ContactBookEditModal";
+import LoginModal from "./components/LoginModal";
 function App() {
   const dispatch = useDispatch();
   // const [contactBookList, setContactBookList] = useState([]);
@@ -26,8 +27,12 @@ function App() {
     }
   };
 
+  
+
   useEffect(() => {
     handleContactBook();
+    // open login modal
+    new mdb.Modal(document.querySelector('#loginModal')).show() // show modal
   }, []);
 
   const handleModalOpen = () => {
@@ -63,6 +68,7 @@ function App() {
     setContactBookPut(contact_book_list.filter(value=> value.contact_book_id === contact_book_id)[0]);
     new mdb.Modal(document.querySelector("#contactBookEditModal")).show();
   }
+  
 
   return (
     <>
@@ -153,6 +159,7 @@ function App() {
       {/* ===========Modal Import========= */}
       <ContactBookCreateModal></ContactBookCreateModal>
       <ContactBookEditModal contactBookPut={contactBookPut}></ContactBookEditModal>
+      <LoginModal></LoginModal>
     </>
   );
 }

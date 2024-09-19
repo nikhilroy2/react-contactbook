@@ -58,7 +58,7 @@ function ContactBookCreateModal(props) {
       <div className="modal-dialog">
         <form className="modal-content" onSubmit={handleContactBookSubmit}>
           <div className="modal-header">
-            <h5 className="modal-title" id="exampleModalLabel">
+            <h5 className="modal-title text-black" id="exampleModalLabel">
               Create Contact Book
             </h5>
             <button
