@@ -39,7 +39,7 @@ function App() {
 
   const handleModalOpen = () => {
     dispatch(isContactBookModal(true));
-    new mdb.Modal(document.querySelector("#contactBookCreateModal")).show();
+    loggedUser ? '' : new mdb.Modal(document.querySelector("#contactBookCreateModal")).show();
   };
 
   const handleDelete = async (contact_book_id) => {
